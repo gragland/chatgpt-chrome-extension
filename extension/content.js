@@ -66,11 +66,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         restoreCursor();
       })
-      .catch(() => {
+      .catch((error) => {
         restoreCursor();
         alert(
           "Error. Make sure you're running a local ChatGPT server on port 3000."
         );
+        throw new Error(error);
       });
   }
 });
