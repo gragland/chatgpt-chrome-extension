@@ -2,28 +2,18 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import { ChatGPTAPI } from "chatgpt";
-import Default from "./plugins/Default.js";
-import Image from "./plugins/Image.js";
-import Gangster from "./plugins/Gangster.js";
+
+import config from "./config.js";
 
 const app = express().use(cors()).use(bodyParser.json());
 const gptApi = new ChatGPTAPI();
 
-const config = configure({
-  plugins: [
-    // Stop telling me you can't browse the internet, etc
-    Default,
-    // Add image generation ability
-    Image,
-    // Talk like a 1940's gangster
-    Gangster,
-  ],
-});
+const Config = configure(config);
 
 app.post("/", async (req, res) => {
   try {
     const rawReply = await gptApi.sendMessage(req.body.message);
-    const reply = await config.parse(rawReply);
+    const reply = await Config.parse(rawReply);
     res.json({ reply });
   } catch (error) {
     console.log(error);
@@ -34,7 +24,7 @@ app.post("/", async (req, res) => {
 async function start() {
   console.log(`Starting up ...`);
   await gptApi.init({ auth: "blocking" });
-  await config.train();
+  await Config.train();
   app.listen(3000, () => console.log(`Listening on port 3000`));
 }
 
@@ -57,7 +47,7 @@ function configure({ plugins, ...opts }) {
     if (!rules.length) return;
 
     console.log(
-      `Training ChatGPT with ${config.rules.length} plugin rules ...`
+      `Training ChatGPT with ${Config.rules.length} plugin rules ...`
     );
 
     const message = `
@@ -66,8 +56,6 @@ function configure({ plugins, ...opts }) {
         return `\n- ${rule}`;
       })}
     `;
-
-    //   These rules don't always need to be used together. Please reply and give an example of each rule used separately.
 
     return gptApi.sendMessage(message);
   };
