@@ -6,8 +6,6 @@ export default {
     `First check if my message includes the word "image", "photo", "picture", or "drawing"`,
     `If it does include one of those words then at the very end of your reply you should include an image description enclosed in double curly brackets.`,
     `If it does not include one of those words then don't add an image description.`,
-    `Here's an example: If I asked for "your opinion on cats with a picture" you might reply "I'm a big fan of cats {{beautiful siamese cat laying in the sun}}`,
-    `If I just ask for "your opinion on cats" you'd just reply "I'm a big fan of cats" and not include an image description`,
   ],
   parse: async (reply) => {
     // Match anything between {{ }}

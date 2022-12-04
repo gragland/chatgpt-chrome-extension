@@ -9,7 +9,7 @@ const config = {
     // Add image generation ability
     Image,
     // Talk like a 1940's gangster
-    Gangster,
+    //Gangster,
   ],
 };
 
