@@ -5,7 +5,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     let text;
 
     // If there's an active text input
-    if (document.activeElement && document.activeElement.isContentEditable) {
+    if (
+      document.activeElement &&
+      (document.activeElement.isContentEditable ||
+        document.activeElement.nodeName.toUpperCase() === "TEXTAREA" ||
+        document.activeElement.nodeName.toUpperCase() === "INPUT")
+    ) {
       // Set as original for later
       originalActiveElement = document.activeElement;
       // Use selected text or all text in the input
@@ -19,7 +24,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     if (!text) {
       alert(
-        "Click in a text area that contains text or select some text on the page"
+        "No text found. Select this option after right clicking on a textarea that contains text or on a selected portion of text."
       );
       return;
     }
@@ -37,28 +42,42 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       .then((response) => response.json())
       .then(async (data) => {
         // Use original text element and fallback to current active text element
-        const element =
+        const activeElement =
           originalActiveElement ||
           (document.activeElement.isContentEditable && document.activeElement);
 
-        if (element) {
-          const replyNode = document.createTextNode(`\n\n${data.reply}`);
+        if (activeElement) {
+          if (
+            activeElement.nodeName.toUpperCase() === "TEXTAREA" ||
+            activeElement.nodeName.toUpperCase() === "INPUT"
+          ) {
+            // Insert after selection
+            activeElement.value =
+              activeElement.value.slice(0, activeElement.selectionEnd) +
+              `\n\n${data.reply}` +
+              activeElement.value.slice(
+                activeElement.selectionEnd,
+                activeElement.length
+              );
+          } else {
+            // Special handling for contenteditable
+            const replyNode = document.createTextNode(`\n\n${data.reply}`);
+            const selection = window.getSelection();
 
-          const selection = window.getSelection();
+            if (selection.rangeCount === 0) {
+              selection.addRange(document.createRange());
+              selection.getRangeAt(0).collapse(activeElement, 1);
+            }
 
-          if (selection.rangeCount === 0) {
-            selection.addRange(document.createRange());
-            selection.getRangeAt(0).collapse(element, 1);
+            const range = selection.getRangeAt(0);
+            range.collapse(false);
+
+            // Insert reply
+            range.insertNode(replyNode);
+
+            // Move the cursor to the end
+            selection.collapse(replyNode, replyNode.length);
           }
-
-          const range = selection.getRangeAt(0);
-          range.collapse(false);
-
-          // Insert reply
-          range.insertNode(replyNode);
-
-          // Move the cursor to the end
-          selection.collapse(replyNode, replyNode.length);
         } else {
           // Alert reply since no active text area
           alert(`ChatGPT says: ${data.reply}`);
