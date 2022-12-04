@@ -69,7 +69,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       .catch((error) => {
         restoreCursor();
         alert(
-          "Error. Make sure you're running a local ChatGPT server on port 3000."
+          "Error. Make sure you're running the server by following the instructions on https://github.com/gragland/chatgpt-everywhere. Also make sure you don't have an adblocker preventing requests to localhost:3000."
         );
         throw new Error(error);
       });
