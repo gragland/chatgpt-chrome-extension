@@ -1,12 +1,21 @@
 // Listen for messages from the background script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "ASK_CHATGPT") {
-    // Get selected text or text in active contenteditable element
-    const text =
-      document.getSelection().toString().trim() ||
-      (document.activeElement && document.activeElement.isContentEditable
-        ? document.activeElement.textContent.trim()
-        : "");
+    let originalActiveElement;
+    let text;
+
+    // If there's an active text input
+    if (document.activeElement && document.activeElement.isContentEditable) {
+      // Set as original for later
+      originalActiveElement = document.activeElement;
+      // Use selected text or all text in the input
+      text =
+        document.getSelection().toString().trim() ||
+        document.activeElement.textContent.trim();
+    } else {
+      // If no active text input use any selected text on page
+      text = document.getSelection().toString().trim();
+    }
 
     if (!text) {
       alert(
@@ -27,20 +36,32 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     })
       .then((response) => response.json())
       .then(async (data) => {
-        if (
-          document.activeElement &&
-          document.activeElement.isContentEditable
-        ) {
-          // Insert response
-          document.activeElement.dispatchEvent(
-            new InputEvent("textInput", {
-              data: `\n\n${data.reply}`,
-              bubbles: true,
-            })
-          );
+        // Use original text element and fallback to current active text element
+        const element =
+          originalActiveElement ||
+          (document.activeElement.isContentEditable && document.activeElement);
+
+        if (element) {
+          const replyNode = document.createTextNode(`\n\n${data.reply}`);
+
+          const selection = window.getSelection();
+
+          if (selection.rangeCount === 0) {
+            selection.addRange(document.createRange());
+            selection.getRangeAt(0).collapse(element, 1);
+          }
+
+          const range = selection.getRangeAt(0);
+          range.collapse(false);
+
+          // Insert reply
+          range.insertNode(replyNode);
+
+          // Move the cursor to the end
+          selection.collapse(replyNode, replyNode.length);
         } else {
           // Alert reply since no active text area
-          alert(`Reply from ChatGPT: ${data.reply}`);
+          alert(`ChatGPT says: ${data.reply}`);
         }
 
         restoreCursor();
