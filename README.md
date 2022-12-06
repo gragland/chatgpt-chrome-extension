@@ -1,4 +1,4 @@
-# ChatGPT Everywhere 🤖 ✨
+# ChatGPT Chrome Extension 🤖 ✨
 
 A Chrome extension that adds [ChatGPT](https://chat.openai.com) to every text box on the internet! Use it to write tweets, revise emails, fix coding bugs, or whatever else you need, all without leaving the site you're on. Includes a plugin system for greater control over ChatGPT behavior and ability to interact with 3rd party APIs.
 
@@ -12,7 +12,7 @@ Then install dependencies
 npm install
 ```
 
-Run the server, so the extension can communicate with ChatGPT. This uses [chatgpt-api](https://github.com/transitive-bullshit/chatgpt-api/tree/main/src) and headless Chrome, but we can hopefully remove the need for this in the future.
+Run the server, so the extension can communicate with ChatGPT. This uses [chatgpt-api](https://github.com/transitive-bullshit/chatgpt-api) and headless Chrome, but we can hopefully remove the need for this in the future.
 
 ```bash
 node server.js
