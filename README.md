@@ -14,7 +14,7 @@ Then install dependencies
 npm install
 ```
 
-Copy `.env-example` into a new file named `.env` and get the value of your ChatGPT session token by following the [instructions here](https://github.com/transitive-bullshit/chatgpt-api#session-tokens). Then add that value to your `.env` file.
+Copy `.env-example` into a new file named `.env` and get the value of your ChatGPT session token by following the <a href="https://github.com/transitive-bullshit/chatgpt-api#session-tokens" target="_blank">instructions here</a>. Then add that value to your `.env` file.
 
 Run the server so the extension can communicate with ChatGPT.
 
