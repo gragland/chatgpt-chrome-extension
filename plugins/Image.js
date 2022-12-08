@@ -14,7 +14,7 @@ export default {
     if (matches?.length) {
       for (const match of matches) {
         // Get image description between curly brackets
-        const imageDescription = match.replace(regex, "$1");
+        const imageDescription = match.replace(regex, "$1").trim();
         // Search for image on Lexica
         const image = await fetch(
           `https://lexica.art/api/v1/search?q=${encodeURIComponent(
@@ -30,14 +30,15 @@ export default {
               return `https://image.lexica.art/md/${response?.images[0]?.id}`;
             }
           })
-          .catch(() => {
-            console.log("Error: Could not get image from Lexica");
+          .catch((error) => {
+            // Ignore error
           });
 
         // Replace description with image URL
-        reply = reply.replace(`\{\{${imageDescription}\}\}`, image);
+        reply = image
+          ? reply.replace(`\{\{${imageDescription}\}\}`, image)
+          : reply;
       }
-      console.log(`Reply with parsed images: ${reply}\n`);
     }
     return reply;
   },

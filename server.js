@@ -1,19 +1,31 @@
+import dotenv from "dotenv-safe";
+dotenv.config();
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import { ChatGPTAPI } from "chatgpt";
+import { oraPromise } from "ora";
 
 import config from "./config.js";
 
 const app = express().use(cors()).use(bodyParser.json());
-const gptApi = new ChatGPTAPI();
+const gptApi = new ChatGPTAPI({
+  sessionToken: process.env.SESSION_TOKEN,
+});
 
 const Config = configure(config);
+const conversation = gptApi.getConversation();
 
 app.post("/", async (req, res) => {
   try {
-    const rawReply = await gptApi.sendMessage(req.body.message);
+    const rawReply = await oraPromise(
+      conversation.sendMessage(req.body.message),
+      {
+        text: req.body.message,
+      }
+    );
     const reply = await Config.parse(rawReply);
+    console.log(`----------\n${reply}\n----------`);
     res.json({ reply });
   } catch (error) {
     console.log(error);
@@ -22,10 +34,16 @@ app.post("/", async (req, res) => {
 });
 
 async function start() {
-  console.log(`Starting up ...`);
-  await gptApi.init({ auth: "blocking" });
-  await Config.train();
-  app.listen(3000, () => console.log(`Listening on port 3000`));
+  await oraPromise(gptApi.ensureAuth(), { text: "Connecting to ChatGPT" });
+  await oraPromise(Config.train(), {
+    text: `Training ChatGPT (${Config.rules.length} plugin rules)`,
+  });
+  await oraPromise(
+    new Promise((resolve) => app.listen(3000, () => resolve())),
+    {
+      text: `You may now use the extension`,
+    }
+  );
 }
 
 function configure({ plugins, ...opts }) {
@@ -46,10 +64,6 @@ function configure({ plugins, ...opts }) {
   const train = () => {
     if (!rules.length) return;
 
-    console.log(
-      `Training ChatGPT with ${Config.rules.length} plugin rules ...`
-    );
-
     const message = `
       Please follow these rules when replying to me:
       ${rules.map((rule) => {
@@ -57,7 +71,7 @@ function configure({ plugins, ...opts }) {
       })}
     `;
 
-    return gptApi.sendMessage(message);
+    return conversation.sendMessage(message);
   };
 
   // Run the ChatGPT response through all plugin parsers

@@ -14,7 +14,9 @@ Then install dependencies
 npm install
 ```
 
-Run the server, so the extension can communicate with ChatGPT. This uses [chatgpt-api](https://github.com/transitive-bullshit/chatgpt-api) and headless Chrome, but we can hopefully remove the need for this in the future.
+Copy `.env-example` into a new file named `.env` and get the value of your ChatGPT session token by following the [instructions here](https://github.com/transitive-bullshit/chatgpt-api#session-tokens). Then add that value to your `.env` file.
+
+Run the server so the extension can communicate with ChatGPT.
 
 ```bash
 node server.js
