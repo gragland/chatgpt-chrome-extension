@@ -5,7 +5,6 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import { ChatGPTAPI } from "chatgpt";
 import { oraPromise } from "ora";
-
 import config from "./config.js";
 
 const app = express().use(cors()).use(bodyParser.json());
@@ -66,11 +65,8 @@ function configure({ plugins, ...opts }) {
 
     const message = `
       Please follow these rules when replying to me:
-      ${rules.map((rule) => {
-        return `\n- ${rule}`;
-      })}
+      ${rules.map(rule => `\n- ${rule}` )}
     `;
-
     return conversation.sendMessage(message);
   };
 
@@ -81,7 +77,6 @@ function configure({ plugins, ...opts }) {
     }
     return reply;
   };
-
   return { train, parse, rules, ...opts };
 }
 
