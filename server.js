@@ -3,17 +3,47 @@ dotenv.config();
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import { ChatGPTAPI } from "chatgpt";
+import { ChatGPTAPIBrowser } from "chatgpt";
 import { oraPromise } from "ora";
 import config from "./config.js";
 
 const app = express().use(cors()).use(bodyParser.json());
-const gptApi = new ChatGPTAPI({
-  sessionToken: process.env.SESSION_TOKEN,
-});
+
+const gptApi = new ChatGPTAPIBrowser({
+  email: process.env.OPENAI_EMAIL,
+  password: process.env.OPENAI_PASSWORD,
+})
+await gptApi.init()
 
 const Config = configure(config);
-const conversation = gptApi.getConversation();
+
+class Conversation {
+  conversationID = null;
+  parentMessageID = null;
+
+  constructor() { }
+
+  async sendMessage(msg) {
+    const res = await gptApi.sendMessage(msg,
+      (this.conversationID && this.parentMessageID) ? {
+                                                        conversationId: this.conversationID,
+                                                        parentMessageId: this.parentMessageID
+                                                      } : {  });
+    if (res.conversationID) {
+      this.conversationID = res.conversationID;
+    }
+    if (res.parentMessageID) {
+      this.parentMessageID = res.parentMessageID;
+    }
+
+    if (res.response) {
+      return res.response
+    }
+    return res
+  }
+}
+
+const conversation = new Conversation()
 
 app.post("/", async (req, res) => {
   try {
@@ -32,8 +62,18 @@ app.post("/", async (req, res) => {
   }
 });
 
+const EnsureAuth = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    if (gptApi.getIsAuthenticated())
+      resolve();
+    else
+      reject();
+  }, 300);
+});
+
+
 async function start() {
-  await oraPromise(gptApi.ensureAuth(), { text: "Connecting to ChatGPT" });
+  await oraPromise(EnsureAuth, { text: "Connecting to ChatGPT" });
   await oraPromise(Config.train(), {
     text: `Training ChatGPT (${Config.rules.length} plugin rules)`,
   });
