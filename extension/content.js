@@ -97,11 +97,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 const showLoadingCursor = () => {
   const style = document.createElement("style");
-  style.id = "corsor_wait";
+  style.id = "cursor_wait";
   style.innerHTML = `* {cursor: wait;}`;
   document.head.insertBefore(style, null);
 };
 
 const restoreCursor = () => {
-  document.getElementById("corsor_wait").remove();
+  document.getElementById("cursor_wait").remove();
 };
