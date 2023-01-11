@@ -12,8 +12,9 @@ const app = express().use(cors()).use(bodyParser.json());
 const gptApi = new ChatGPTAPIBrowser({
   email: process.env.OPENAI_EMAIL,
   password: process.env.OPENAI_PASSWORD,
-})
-await gptApi.init()
+});
+
+await gptApi.initSession();
 
 const Config = configure(config);
 
@@ -21,14 +22,18 @@ class Conversation {
   conversationID = null;
   parentMessageID = null;
 
-  constructor() { }
+  constructor() {}
 
   async sendMessage(msg) {
-    const res = await gptApi.sendMessage(msg,
-      (this.conversationID && this.parentMessageID) ? {
-                                                        conversationId: this.conversationID,
-                                                        parentMessageId: this.parentMessageID
-                                                      } : {  });
+    const res = await gptApi.sendMessage(
+      msg,
+      this.conversationID && this.parentMessageID
+        ? {
+            conversationId: this.conversationID,
+            parentMessageId: this.parentMessageID,
+          }
+        : {}
+    );
     if (res.conversationID) {
       this.conversationID = res.conversationID;
     }
@@ -37,13 +42,13 @@ class Conversation {
     }
 
     if (res.response) {
-      return res.response
+      return res.response;
     }
-    return res
+    return res;
   }
 }
 
-const conversation = new Conversation()
+const conversation = new Conversation();
 
 app.post("/", async (req, res) => {
   try {
@@ -64,13 +69,10 @@ app.post("/", async (req, res) => {
 
 const EnsureAuth = new Promise((resolve, reject) => {
   setTimeout(() => {
-    if (gptApi.getIsAuthenticated())
-      resolve();
-    else
-      reject();
+    if (gptApi.getIsAuthenticated()) resolve();
+    else reject();
   }, 300);
 });
-
 
 async function start() {
   await oraPromise(EnsureAuth, { text: "Connecting to ChatGPT" });
@@ -105,7 +107,7 @@ function configure({ plugins, ...opts }) {
 
     const message = `
       Please follow these rules when replying to me:
-      ${rules.map(rule => `\n- ${rule}` )}
+      ${rules.map((rule) => `\n- ${rule}`)}
     `;
     return conversation.sendMessage(message);
   };

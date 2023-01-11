@@ -4,7 +4,7 @@
   },
   "dependencies": {
     "body-parser": "^1.20.1",
-    "chatgpt": "^2.5.2",
+    "chatgpt": "^3.3.13",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "dotenv-safe": "^8.2.0",

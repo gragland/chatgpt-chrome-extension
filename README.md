@@ -14,13 +14,15 @@ Then install dependencies
 npm install
 ```
 
-Copy `.env-example` into a new file named `.env` and get the value of your ChatGPT session token by following the <a href="https://github.com/transitive-bullshit/chatgpt-api#session-tokens" target="_blank">instructions here</a>. Then add that value to your `.env` file.
+Copy `.env-example` into a new file named `.env` and add your ChatGPT email and password.
 
 Run the server so the extension can communicate with ChatGPT.
 
 ```bash
 node server.js
 ```
+
+This will automate interaction with ChatGPT through a headless Chrome browser, thanks to the [chatgpt-api](https://github.com/transitive-bullshit/chatgpt-api) library. You will see the browser pop up after running your server. It should automatically log you in, but you may need to manually solve a captcha to complete the process.
 
 Add the extension
 
@@ -30,6 +32,10 @@ Add the extension
 4. Select your local `chatgpt-chrome-extension/extension` directory
 
 You'll now see "Ask ChatGPT" if you right click in any text input or content editable area.
+
+## Troubleshooting
+
+If ChatGPT is taking a very long time to respond or not responding at all then it could mean that their servers are currently overloaded. You can confirm this by going to [chat.openai.com/chat](https://chat.openai.com/chat) and seeing whether their website works directly.
 
 ## Plugins
 
