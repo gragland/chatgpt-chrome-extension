@@ -3,18 +3,15 @@ dotenv.config();
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import { ChatGPTAPIBrowser } from "chatgpt";
+import { ChatGPTAPI } from "chatgpt";
 import { oraPromise } from "ora";
 import config from "./config.js";
 
 const app = express().use(cors()).use(bodyParser.json());
 
-const gptApi = new ChatGPTAPIBrowser({
-  email: process.env.OPENAI_EMAIL,
-  password: process.env.OPENAI_PASSWORD,
+const gptApi = new ChatGPTAPI({
+  apiKey: process.env.OPENAI_API_KEY
 });
-
-await gptApi.initSession();
 
 const Config = configure(config);
 
@@ -58,7 +55,7 @@ app.post("/", async (req, res) => {
         text: req.body.message,
       }
     );
-    const reply = await Config.parse(rawReply);
+    const reply = await Config.parse(rawReply.text);
     console.log(`----------\n${reply}\n----------`);
     res.json({ reply });
   } catch (error) {
@@ -67,15 +64,7 @@ app.post("/", async (req, res) => {
   }
 });
 
-const EnsureAuth = new Promise((resolve, reject) => {
-  setTimeout(() => {
-    if (gptApi.getIsAuthenticated()) resolve();
-    else reject();
-  }, 300);
-});
-
 async function start() {
-  await oraPromise(EnsureAuth, { text: "Connecting to ChatGPT" });
   await oraPromise(Config.train(), {
     text: `Training ChatGPT (${Config.rules.length} plugin rules)`,
   });

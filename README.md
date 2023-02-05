@@ -14,7 +14,7 @@ Then install dependencies
 npm install
 ```
 
-Copy `.env-example` into a new file named `.env` and add your ChatGPT email and password.
+Copy `.env-example` into a new file named `.env` and add your ChatGPT API Key.
 
 Run the server so the extension can communicate with ChatGPT.
 
@@ -22,7 +22,7 @@ Run the server so the extension can communicate with ChatGPT.
 node server.js
 ```
 
-This will automate interaction with ChatGPT through a headless Chrome browser, thanks to the [chatgpt-api](https://github.com/transitive-bullshit/chatgpt-api) library. You will see the browser pop up after running your server. It should automatically log you in, but you may need to manually solve a captcha to complete the process.
+This will automate interaction with ChatGPT through a ChatGPT API, thanks to the [chatgpt-api](https://github.com/transitive-bullshit/chatgpt-api) library
 
 Add the extension
 
