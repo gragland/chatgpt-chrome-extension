@@ -22,7 +22,7 @@ Run the server so the extension can communicate with ChatGPT.
 node server.js
 ```
 
-This will automate interaction with ChatGPT through a ChatGPT API, thanks to the [chatgpt-api](https://github.com/transitive-bullshit/chatgpt-api) library
+This will automate interaction with ChatGPT through OpenAI's API, thanks to the [chatgpt-api](https://github.com/transitive-bullshit/chatgpt-api) library.
 
 Add the extension
 
