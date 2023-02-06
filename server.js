@@ -31,11 +31,12 @@ class Conversation {
           }
         : {}
     );
-    if (res.conversationID) {
-      this.conversationID = res.conversationID;
+    
+    if (res.conversationId) {
+      this.conversationID = res.conversationId;
     }
-    if (res.parentMessageID) {
-      this.parentMessageID = res.parentMessageID;
+    if (res.parentMessageId) {
+      this.parentMessageID = res.parentMessageId;
     }
 
     if (res.response) {
