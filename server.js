@@ -7,6 +7,8 @@ import { ChatGPTAPI } from "chatgpt";
 import { oraPromise } from "ora";
 import config from "./config.js";
 
+
+
 const app = express().use(cors()).use(bodyParser.json());
 
 const gptApi = new ChatGPTAPI({
